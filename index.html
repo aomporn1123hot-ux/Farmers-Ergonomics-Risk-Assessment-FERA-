@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>แบบประเมินความเสี่ยง</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <img src="ภาพปก.png" alt="ภาพปก" class="cover-img">
+  <img src="ภาพปก.png" alt="ภาพปก" class="cover-img" />
 
   <form id="assessmentForm">
     <!-- หน้า 0 -->
@@ -37,17 +37,17 @@
     <!-- หน้า 4: ข้อ 5-7 -->
     <div class="page" id="page4">
       <h2>ข้อ 5: การออกแรง</h2>
-      <label><input type="radio" name="force" value="1"> น้อยกว่า 5 กิโลกรัม</label><br>
-      <label><input type="radio" name="force" value="2"> 5–10 กิโลกรัม</label><br>
-      <label><input type="radio" name="force" value="3"> มากกว่า 10 กิโลกรัม</label><br>
+      <label><input type="radio" name="force" value="1" required> น้อยกว่า 5 กิโลกรัม</label><br />
+      <label><input type="radio" name="force" value="2"> 5–10 กิโลกรัม</label><br />
+      <label><input type="radio" name="force" value="3"> มากกว่า 10 กิโลกรัม</label><br />
 
       <h2>ข้อ 6: การทำงานซ้ำ ๆ</h2>
-      <label><input type="radio" name="repetition" value="1"> มากกว่า 4 ครั้งใน 1 นาที</label><br>
-      <label><input type="radio" name="repetition" value="0"> น้อยกว่า 4 ครั้งใน 1 นาที</label><br>
+      <label><input type="radio" name="repetition" value="1" required> มากกว่า 4 ครั้งใน 1 นาที</label><br />
+      <label><input type="radio" name="repetition" value="0"> น้อยกว่า 4 ครั้งใน 1 นาที</label><br />
 
       <h2>ข้อ 7: การบิด/หมุน</h2>
-      <label><input type="radio" name="twist" value="1"> มีการบิด/หมุน ข้อมือหรือคอ</label><br>
-      <label><input type="radio" name="twist" value="0"> ไม่มีการบิด/หมุน</label><br>
+      <label><input type="radio" name="twist" value="1" required> มีการบิด/หมุน ข้อมือหรือคอ</label><br />
+      <label><input type="radio" name="twist" value="0"> ไม่มีการบิด/หมุน</label><br />
 
       <div class="nav-buttons">
         <button type="button" onclick="prevPage()">ย้อนกลับ</button>
@@ -59,10 +59,13 @@
     <div class="page" id="page5">
       <h2>ผลการประเมิน</h2>
       <p id="resultText"></p>
-      <img id="resultImage" src="" alt="ผลการประเมิน">
+      <img id="resultImage" src="" alt="ผลการประเมิน" />
+      <div class="nav-buttons">
+        <button type="button" onclick="showPage(0)">เริ่มใหม่</button>
+      </div>
     </div>
   </form>
 
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
