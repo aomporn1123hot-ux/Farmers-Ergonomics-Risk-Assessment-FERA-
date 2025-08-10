@@ -195,15 +195,14 @@ form.addEventListener("submit", async function (e) {
 
   showPage(5);
 
+   window.onload = () => {
+  createImageOptions("upperPostureOptions", "upperPosture", 10, "บน");
+  createImageOptions("lowerPostureOptions", "lowerPosture", 8, "ล่าง");
+  showPage(0);
+};
   // บันทึกข้อมูลลง Firestore
   const dataToSave = {
     timestamp: new Date().toISOString(),
     upperPosture: upPosture,
     upperTime: ut,
     lowerPosture
-
-    window.onload = () => {
-  createImageOptions("upperPostureOptions", "upperPosture", 10, "บน");
-  createImageOptions("lowerPostureOptions", "lowerPosture", 8, "ล่าง");
-  showPage(0);
-};
