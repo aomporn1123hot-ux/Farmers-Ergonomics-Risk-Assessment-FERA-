@@ -1,22 +1,32 @@
-const scriptURL = "https://script.google.com/macros/s/AKfycbw31uuW7ZE3dZfk_ShYgDbYT0cO4peD2DK7Ofsfr7Czhp6T22RTz_hFCp1-62_1EY72YQ/exec";
-document.getElementById('myForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const form = e.target;
-  const formData = new FormData(form);
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-  formData.set("Date", new Date().toISOString());
+const firebaseConfig = {
+  apiKey: "AIzaSyBZMJ6Xv6Nsy_f7Kb3SnK4soS0m3PkCgFc",
+  authDomain: "fera-38125.firebaseapp.com",
+  projectId: "fera-38125",
+  storageBucket: "fera-38125.firebasestorage.app",
+  messagingSenderId: "281508827972",
+  appId: "1:281508827972:web:96f6b7481637194533fd11",
+  measurementId: "G-M9R0MFJLQ5"
+};
 
-  fetch(scriptURL, { method: 'POST', body: formData })
-    .then(response => response.json())
-    .then(result => {
-      document.getElementById('status').textContent = "ส่งข้อมูลสำเร็จ!";
-      form.reset();
-    })
-    .catch(error => {
-      console.error('Error!', error.message);
-      document.getElementById('status').textContent = "เกิดข้อผิดพลาด";
-    });
-});
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getFirestore(app);
+
+// ฟังก์ชันบันทึกข้อมูลลง Firestore
+async function saveDataToFirestore(data) {
+  try {
+    const docRef = await addDoc(collection(db, "responses"), data);
+    console.log("Document written with ID:", docRef.id);
+  } catch (error) {
+    console.error("Error adding document:", error);
+  }
+}
+
 const form = document.getElementById("assessmentForm");
 const pages = document.querySelectorAll(".page");
 let currentPageIndex = 0;
@@ -36,6 +46,7 @@ function prevPage() {
 
 function createImageOptions(containerId, name, count, prefix) {
   const container = document.getElementById(containerId);
+  container.innerHTML = ""; // เคลียร์ก่อนสร้างใหม่
   for (let i = 1; i <= count; i++) {
     const label = document.createElement("label");
     label.className = "image-option";
@@ -107,15 +118,15 @@ function nextLowerTimePage() {
   showPage(3);
 }
 
-form.addEventListener("submit", function (e) {
+form.addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  const getVal = name => {
+  const getVal = (name) => {
     const el = document.querySelector(`input[name="${name}"]:checked`);
     return el ? parseInt(el.value) : 0;
   };
 
-  const upScore = 1;  // ข้อ 1: ให้ 1 คะแนนตายตัว
+  const upScore = 1; // ข้อ 1: ให้ 1 คะแนนตายตัว
   const ut = getVal("upperTime");
 
   const lowScore = 1; // ข้อ 3: ให้ 1 คะแนนตายตัว
@@ -127,49 +138,66 @@ form.addEventListener("submit", function (e) {
 
   // upperMap & lowerMap สำหรับข้อ 2 และข้อ 4
   const upperMap = {
-    1: [0, 0, 1, 2], 2: [0, 0, 1, 2], 3: [1, 2, 3], 4: [1, 2, 3],
-    5: [2, 3], 6: [2, 3], 7: [2, 3], 8: [3], 9: [3], 10: [3]
+    1: [0, 0, 1, 2],
+    2: [0, 0, 1, 2],
+    3: [1, 2, 3],
+    4: [1, 2, 3],
+    5: [2, 3],
+    6: [2, 3],
+    7: [2, 3],
+    8: [3],
+    9: [3],
+    10: [3],
   };
   const lowerMap = {
-    1: [1, 2, 3], 2: [2, 3], 3: [3], 4: [3], 5: [3],
-    6: [2, 3], 7: [2, 3], 8: [2, 3]
+    1: [1, 2, 3],
+    2: [2, 3],
+    3: [3],
+    4: [3],
+    5: [3],
+    6: [2, 3],
+    7: [2, 3],
+    8: [2, 3],
   };
 
   const upPosture = getVal("upperPosture");
   const lowPosture = getVal("lowerPosture");
 
-  const utScore = (upperMap[upPosture]?.[ut]) ?? 0;
-  const ltScore = (lowerMap[lowPosture]?.[lt]) ?? 0;
+  const utScore = upperMap[upPosture]?.[ut] ?? 0;
+  const ltScore = lowerMap[lowPosture]?.[lt] ?? 0;
 
   const total = (upScore + utScore) * (lowScore + ltScore) + f + r + t;
 
-  let level = "", image = "";
+  let level = "",
+    image = "";
   if (total === 1) {
-    level = "ระดับยอมรับได้ ท่าทางการปฏิบัติงานนั้นยังไม่ควรได้รับการปรับปรุง";
+    level =
+      "ระดับยอมรับได้ ท่าทางการปฏิบัติงานนั้นยังไม่ควรได้รับการปรับปรุง";
     image = "ยอมรับได้.jpg";
   } else if (total <= 3) {
     level = "ระดับต่ำ ท่าทางการปฏิบัติงานนั้นควรได้รับการปรับปรุงเล็กน้อย";
     image = "ต่ำ.jpg";
   } else if (total <= 7) {
-    level = "ระดับปานกลาง ท่าทางการปฏิบัติงานนั้นควรได้รับการปรับปรุงเพิ่มเติม";
+    level =
+      "ระดับปานกลาง ท่าทางการปฏิบัติงานนั้นควรได้รับการปรับปรุงเพิ่มเติม";
     image = "ปานกลาง.jpg";
   } else if (total <= 14) {
     level = "ระดับสูง ท่าทางการปฏิบัติงานนั้นควรได้รับการปรับปรุงเร่งด่วน";
     image = "สูง.jpg";
   } else {
-    level = "ระดับสูงมาก ท่าทางการปฏิบัติงานนั้นควรได้รับการปรับปรุงในทันที";
+    level =
+      "ระดับสูงมาก ท่าทางการปฏิบัติงานนั้นควรได้รับการปรับปรุงในทันที";
     image = "สูงมาก.jpg";
   }
 
-document.getElementById("resultText").textContent = `คะแนนรวม: ${total} (${level})`;
-document.getElementById("resultImage").src = image;
-
-document.getElementById("resultText").textContent = `คะแนนรวม: ${total} (${level})`;
+  document.getElementById("resultText").textContent = `คะแนนรวม: ${total} (${level})`;
   document.getElementById("resultImage").src = image;
+
   showPage(5);
-});
-window.onload = () => {
-  createImageOptions("upperPostureOptions", "upperPosture", 10, "ส่วนบน");
-  createImageOptions("lowerPostureOptions", "lowerPosture", 8, "ส่วนล่าง");
-  showPage(0);
-};
+
+  // บันทึกข้อมูลลง Firestore
+  const dataToSave = {
+    timestamp: new Date().toISOString(),
+    upperPosture: upPosture,
+    upperTime: ut,
+    lowerPosture
