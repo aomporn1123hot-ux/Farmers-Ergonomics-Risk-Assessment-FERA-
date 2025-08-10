@@ -201,3 +201,9 @@ form.addEventListener("submit", async function (e) {
     upperPosture: upPosture,
     upperTime: ut,
     lowerPosture
+
+    window.onload = () => {
+  createImageOptions("upperPostureOptions", "upperPosture", 10, "บน");
+  createImageOptions("lowerPostureOptions", "lowerPosture", 8, "ล่าง");
+  showPage(0);
+};
